@@ -4,14 +4,12 @@ import random
 
 cmdln_args = " ".join(sys.argv)
 op = OptionParser()
-default_txt = 'words.txt'
-blacklist_txt = 'blacklist.txt'
 op.add_option("-n", "--num", dest="num_words", help="number of words to output", default=10)
 op.add_option("-r", "--random_output_size", dest="random_out", help="output a randum number of words up to num_words",
               default=False,
               action="store_true")
-op.add_option("-f", "--file", dest="file_name", help="prose text to pull words from", default=default_txt)
-op.add_option("-b", "--blacklist", dest="blacklist", help="blacklisted words", default=blacklist_txt)
+op.add_option("-f", "--file", dest="file_name", help="prose text to pull words from")
+op.add_option("-b", "--blacklist", dest="blacklist", help="blacklisted words")
 op.add_option("-p", "--probabilities", dest="use_probabilities", default=True, action="store_true",
               help="Use probabilistic mapping between words")
 
@@ -34,10 +32,6 @@ class Word():
 
 
 class WordToy():
-  blacklist = set()
-  word_counts = {}  # word_id to (word, probability, count, id)
-  words_in_order = None # temporary data structure used to generate ngrams
-  next_words = {}
   include_phrase_ends = False
   include_sentence_ends = True
 
@@ -49,6 +43,10 @@ class WordToy():
   phrase_end = Word(", ",0,0,", ".__hash__())
 
   def __init__(self, *args, **kwargs):
+    self.blacklist = set()
+    self.word_counts = {}  # word_id to (word, probability, count, id)
+    self.words_in_order = None  # temporary data structure used to generate ngrams
+    self.next_words = {}
     black_list_file = kwargs.pop('black_list_file', None)
     generate_word_order_list = kwargs.pop('generate_word_order_list', None)
     prose_file_name = kwargs.pop('prose_file', None)
@@ -67,7 +65,7 @@ class WordToy():
 
   def _load_black_list(self, black_list_file):
     if black_list_file:
-      bf = open(black_list, 'r')
+      bf = open(black_list_file, 'r')
       for line in bf:
         line = line.strip()
         self.blacklist.add(line)
@@ -173,6 +171,7 @@ class WordToy():
     chosen_words = ''
     prior_word = 0
     prior_word_2 = 0
+    nexts = {}
     for i in range(0, num_words):
       try:
         if rand_word_id == prior_word == prior_word_2: # break up chains of repeating words
@@ -250,13 +249,12 @@ class WordToy():
       words.append(word.word)
     return sorted(words)
 
-if __name__ == '__main__':
-  wg = WordToy(blacklist_txt, prose_txt)
-
-  if random_out:
-    num_words = random.randint(1, num_words)
-
-  result = wg.pick_n_random(num_words, use_probabilities)
-  print result
-
+# if __name__ == '__main__':
+#   wg = WordToy(blacklist_txt, prose_txt)
+#
+#   if random_out:
+#     num_words = random.randint(1, num_words)
+#
+#   result = wg.pick_n_random(num_words, use_probabilities)
+#   print result
 
