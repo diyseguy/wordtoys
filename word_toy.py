@@ -174,7 +174,7 @@ class WordToy():
     nexts = {}
     for i in range(0, num_words):
       try:
-        if rand_word_id == prior_word == prior_word_2: # break up chains of repeating words
+        if (rand_word_id is None) or (rand_word_id == prior_word == prior_word_2): # break up chains of repeating words
           rand_word_id = self.get_random_word()
         rand_word = self.word_counts[rand_word_id].word
         chosen_words += rand_word + ' '
